@@ -1,0 +1,33 @@
+## Manage Bluetooth without handing control to a shell command.
+
+AirBlued is an `nmtui`-style terminal interface for Linux Bluetooth. It talks to the running `bluetoothd` service over system D-Bus through `bluer`; it does not call out to `bluetoothctl`.
+
+### Keep UI state in one place
+
+The event loop owns application state. Bluetooth work runs in background tasks and sends results through an event channel, so those tasks do not mutate UI state directly. Input events and a ticker feed the same loop, while short-lived device actions report completion and request a refresh.
+
+### Work with devices in place
+
+The interface enumerates known devices, streams live scan results sorted by signal strength, and supports connect, disconnect, trust, untrust, rename, and remove actions. Removing a device requires confirmation. Stopping a scan drops its BlueZ discovery session so the radio scan ends with the screen.
+
+### How the pieces fit
+
+- **Rust** for the application and its event loop.
+- **ratatui** and **crossterm** for the terminal layout and input handling.
+- **bluer** for the BlueZ calls.
+- **system D-Bus** as the channel to the running `bluetoothd`.
+
+### What works today
+
+The README marks the scaffold, live device reads, scanning, and core device actions as implemented.
+
+### What is still open
+
+- Pairing-agent prompts.
+- Adapter settings.
+- Filtering and toasts.
+- GATT browsing.
+
+### Requirements
+
+Linux with BlueZ running, Rust 1.88 or newer, and system D-Bus access.

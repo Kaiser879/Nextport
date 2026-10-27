@@ -1,0 +1,32 @@
+## A recommendation only helps if it is available here.
+
+Streaming catalogs vary by region. A title that looks interesting is a dead end if it cannot be streamed, rented, or bought in India. Your Next Binge puts India availability at the center of discovery, then adds semantic search and a watchlist around that constraint.
+
+### Discovery grounded in local availability
+
+Home discovery uses TMDB data scoped to India. Provider offers are grouped into **Stream**, **Rent**, and **Buy** so ad-supported options are not silently excluded. The detail view carries those offers forward, while My List stores title snapshots that persist across an app restart.
+
+### Search that stays useful offline
+
+A small FastAPI service encodes a query. The app compares the resulting vector on-device against a bundled index of India-scoped titles. If semantic search is unavailable, the app falls back to TMDB keyword results and then local title matching, and it reports which mode produced the results.
+
+### How the pieces fit
+
+- **The TV app** — React Native for Vega and TypeScript. It owns discovery, availability, the watchlist, and provider selection.
+- **The catalog** — TMDB supplies titles and the regional offer data that decides whether something is actually watchable here.
+- **The encoder** — a FastAPI service running sentence-transformers, which turns a natural-language query into a vector.
+- **The index** — 1,198 India-scoped titles embedded ahead of time and bundled with the app, so a comparison costs a lookup rather than a network round trip.
+
+Keeping the index on-device is what makes search survive a bad connection: only the query encoding needs the service, and keyword and title matching sit underneath as a second fallback.
+
+### Results
+
+- The bundled index contains **1,198 India-scoped titles**.
+- Five semantic search gate queries completed in **31–33 ms** on the Vega Virtual Device.
+- The watchlist and selected services survived force-stop and relaunch in the documented device check.
+- Debug and Release builds were installed and launched on the Vega Virtual Device.
+- The test suite covers **76 Jest tests**.
+
+### Limits
+
+The project README notes that physical Fire TV hardware was not tested. Trailer playback was cut because the tested virtual-device image did not include the required WebView module.

@@ -1,0 +1,28 @@
+## People remember what a file said, not what it was called.
+
+A filename like “l.pdf” gives little help when someone remembers only that the document discussed Linux process scheduling. mem indexes local document text and lets the search explain how it interpreted the request.
+
+### Keep the index in sync
+
+The scanner extracts text from PDFs and common office formats, then makes it searchable with SQLite FTS5. Incremental scans skip files whose size and modification time have not changed. An existing project case study records a second scan of a 46-file sample at 4 ms, compared with 800 ms for the first scan.
+
+### Make the query legible
+
+Before SQLite sees a query, mem removes stop words, extracts file-type and date hints, and lightly singularizes terms. The interface shows parsed keywords and constraints so people can correct a mistaken interpretation. BM25 ranking gives filename matches extra weight.
+
+### Make a miss honest
+
+When nothing matches, mem reports the miss and the constraints that excluded possible files instead of filling the page with unrelated recent documents.
+
+### How the pieces fit
+
+- **Go** runs the scanner, the query parser, and the terminal interface.
+- **SQLite FTS5** stores the text index and does the matching; BM25 orders the results.
+- **Bubble Tea** drives the terminal UI, including the panel that shows the parsed query.
+- **Tesseract** is optional and only used for printed text when OCR is enabled.
+
+### Limits
+
+Search is deterministic full-text retrieval. It does not use an LLM, identify image subjects, or reliably read handwriting. OCR runs behind a quality gate that rejects noisy output rather than guessing at it.
+
+The project README was not available during this build, so these details were taken from the previous portfolio case study and should be confirmed against the project repository.
